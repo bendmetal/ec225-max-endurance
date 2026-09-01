@@ -1,7 +1,7 @@
 // EC225 Max Endurance - Service Worker
 // Caches the app for full offline use after first load
 
-const CACHE_NAME = 'ec225-max-endurance-v2';
+const CACHE_NAME = 'ec225-max-endurance-v3';
 const FILES_TO_CACHE = [
   './',
   './index.html'
