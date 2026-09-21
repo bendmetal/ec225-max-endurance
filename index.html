@@ -138,6 +138,9 @@
     font-size: 13px; text-decoration: none; -webkit-tap-highlight-color: transparent;
   }
   .chart-link:active { background: #1f2937; }
+  .chart-link.used {
+    border-color: #818cf8; background: rgba(129,140,248,0.18); color: #c7d2fe; font-weight: 600;
+  }
   .chart-link.used-cruise {
     border-color: #818cf8; background: rgba(129,140,248,0.18); color: #c7d2fe; font-weight: 600;
   }
@@ -281,7 +284,7 @@
 
   <div class="section">
     <div class="section-title">Source charts &middot; Section 10.2.A1</div>
-    <div class="section-sub">The 27 published Hp/OAT figures behind every number in this tool &mdash; the same charts used by Cruise Torque &amp; Fuel Burn. Tap a temperature to read Fig n/1 and Fig n/2 full-size. The E-line this tool reads is the dashed line on Fig n/2.</div>
+    <div class="section-sub">The 27 published Hp/OAT figures behind every number in this tool &mdash; the same charts used by Cruise Torque &amp; Fuel Burn. Tap a temperature to read Fig n/1 and Fig n/2 full-size. The E-line this tool reads is the dashed line on Fig n/2. Highlighted figures were used by your last calculation.</div>
     <div id="chart-grid"></div>
   </div>
 
@@ -523,6 +526,9 @@ function calc2(){
   const banner = document.getElementById('r2-banner');
   banner.innerHTML = '';
 
+  try { ec225HighlightCharts(ec225FiguresFor(hp, oat)); }
+  catch (e) { /* the grid is a reference aid; never let it break a result */ }
+
   const tas = lookupEline(hp, oat, wt, 0);
   const torque = lookupEline(hp, oat, wt, 1);
   const fuel = lookupEline(hp, oat, wt, 2);
@@ -756,6 +762,26 @@ function ec225BuildChartGrid(){
     html += '</div></div>';
   });
   el.innerHTML = html;
+}
+
+// Mark the figures this calculation read. Max Endurance interpolates across
+// the two Hp levels and two OATs that bracket the inputs, same as the other
+// Section 10.2.A1 tools -- it just reads the dashed E-line off Fig n/2 rather
+// than Tables A/B. One colour here: unlike the fuel planners there is no
+// separate climb segment to distinguish.
+//
+// Highlighted on every calculation, including one that falls outside the
+// charted envelope -- in that case these are precisely the figures worth
+// checking by hand, which is the same thing Cruise Torque does.
+function ec225HighlightCharts(figs){
+  for (const k in EC225_CHART_FIGS){
+    const e = document.getElementById('chart-link-' + k);
+    if (e) e.classList.remove('used');
+  }
+  (figs || []).forEach(function(n){
+    const e = document.getElementById('chart-link-' + n);
+    if (e) e.classList.add('used');
+  });
 }
 
 ec225BuildChartGrid();
